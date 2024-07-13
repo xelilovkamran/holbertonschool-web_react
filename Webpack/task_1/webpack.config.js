@@ -5,7 +5,6 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "public"),
         filename: "bundle.js",
-        filename: "index.html",
     },
     mode: "production",
 };
