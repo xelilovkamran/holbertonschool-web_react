@@ -1,4 +1,4 @@
 module.exports = {
-	App: {},
-	Notifications: {}
+  App: {},
+  Notifications: {},
 };
