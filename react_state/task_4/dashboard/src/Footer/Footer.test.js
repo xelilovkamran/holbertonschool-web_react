@@ -1,71 +1,47 @@
 import React from 'react';
-import { expect } from 'chai';
-import Adapter from 'enzyme-adapter-react-16';
-import { shallow, configure, mount } from 'enzyme';
-import Footer from './Footer';
-import { StyleSheetTestUtils } from 'aphrodite';
+import { shallow, mount } from 'enzyme';
+import Footer from "./Footer";
 import AppContext from '../App/AppContext';
 
-configure({adapter: new Adapter()});
-
-describe("Testing the <Footer /> Component", () => {
-	
-	let wrapper;
-
-	beforeEach(() => {
-		StyleSheetTestUtils.suppressStyleInjection();
-		wrapper = shallow(<Footer shouldRender />);
-	});
-
-	afterEach(() => {
-		StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
-	});
-
-	it("<Footer /> is rendered without crashing", () => {
-		expect(wrapper.render()).to.not.be.an('undefined');
-	});
-
-	it("<Footer /> renders at least the text: Copyright", () => {
-		const wrapper = mount(<Footer />);
-		expect(wrapper.find('p').at(0).html()).to.include('Copyright');
-	});
-
-	it("verify that the link is not displayed when the user is logged out within the context", () => {
-		const contextVal = {
-      user: {
-        email: '',
-        password: '',
-        isLoggedIn: false,
-      },
-      logOut: () => this.logOut(),
-		};
-
-		const wrapper = mount(
-			<AppContext.Provider value={contextVal}>
-				<Footer />
-			</AppContext.Provider>
-		);
-
-		expect(wrapper.find('a')).to.have.lengthOf(0);
-	});
-
-	it("verify that the link is not displayed when the user is logged out within the context", () => {
-		const contextVal = {
-      user: {
-        email: 'cyborg13x@gmail.com',
-        password: 'qe135ba',
-        isLoggedIn: true,
-      },
-      logOut: () => this.logOut(),
-		};
-
-		const wrapper = mount(
-			<AppContext.Provider value={contextVal}>
-				<Footer />
-			</AppContext.Provider>
-		);
-
-		expect(wrapper.find('a')).to.have.lengthOf(1);
-	});
-
+describe('Tests the Footer component', () => {
+    let defaultUser;
+    let loggedUser;
+    let logOut;
+    let defaultContextValue;
+    let userDefinedValue;
+    beforeAll(() => {
+        defaultUser = {
+            email: "",
+            password: "",
+            isLoggedIn: false
+        };
+        loggedUser = {
+            email: "hello@world.com",
+            password: "test123!",
+            isLoggedIn: true
+        }
+        logOut = jest.fn();
+        defaultContextValue = {user: defaultUser, logOut};
+        userDefinedValue = {user: loggedUser, logOut};
+    });
+    afterEach(() => {
+        logOut.mockClear();
+    });
+    it('Tests that Footer renders without crashing', () => {
+        const wrapper = shallow(<Footer />);
+        expect(wrapper.exists()).toBe(true);
+    });
+    it('Tests that the component at the very least renders the text “Copyright”', () => {
+        const wrapper = mount(<AppContext.Provider value={defaultContextValue}><Footer text='Copyright'/></AppContext.Provider>);
+        const p = wrapper.find('p');
+        expect(p.text()).toBe(`Copyright`);
+    });
+    it('Tests that the link is not displayed when the user is logged out within the context', () => {
+        const wrapper = mount(<AppContext.Provider value={defaultContextValue}><Footer text='Copyright'/></AppContext.Provider>);
+        expect(wrapper.find('a')).toHaveLength(0);
+    });
+    it('Tests that the link is displayed when the user is logged in within the context', () => {
+        const wrapper = mount(<AppContext.Provider value={userDefinedValue}><Footer text='Copyright'/></AppContext.Provider>);
+        expect(wrapper.find('a')).toHaveLength(1);
+    });
 });

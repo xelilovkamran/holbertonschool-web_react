@@ -1,67 +1,40 @@
-import React, { Component, Fragment } from 'react';
-import logo from '../assets/holberton_logo.jpg';
+import React from 'react';
 import { StyleSheet, css } from 'aphrodite';
 import AppContext from '../App/AppContext';
-import PropTypes from 'prop-types';
 
-class Header extends Component {
-
-	static contextType = AppContext;
-
-	constructor(props) {
-		super(props);
-	};
-
-	render() {
-
-		const { user, logOut } = this.context;
-
-		return (
-			<div className={css(styles.appHeader)}>
-				<img
-					src={logo}
-					alt="logo"
-				/>
-				<h1 className={css(styles.heading1)}>
-					School dashboard
-				</h1>
-				{
-					user.isLoggedIn &&
-					<section id="logoutSection">
-						<hr size="2" width="90%" />
-						Welcome <b>{user.email}</b> <a href="#" onClick={() => logOut()}>(logout)</a>
-					</section>
-				}
-			</div>
-		);
-	};
-};
-
-Header.propTypes = {
-	user: PropTypes.object,
-	logOut: PropTypes.func
-};
-
-Header.defaultProps = {
-	user: {
-		email: '',
-		password: '',
-		isLoggedIn: false,
-	},
-	logOut: () => this.logOut(),
-};
+class Header extends React.Component {
+    render() {
+        return (
+            <>
+                <header className={css(styles.appHeader)}>
+                    <img src={this.props.src} alt={this.props.alt} className={css(styles.appHeaderImg)}/>
+                    <h1>{this.props.text}</h1>
+                </header>
+                {this.context.user.isLoggedIn ? (
+                    <section id='logoutSection'>
+                        Welcome <strong>{this.context.user.email}</strong> <a onClick={() => {this.context.logOut()}}><em>(logout)</em></a>
+                    </section>
+                ) : null}
+                
+            </>
+        );
+    }
+}
+Header.contextType = AppContext;
 
 const styles = StyleSheet.create({
-	appHeader: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'left',
-	},
-	heading1: {
-		margin: 'auto auto auto 0',
-		color: `var(--holberton-red)`,
-		// color: `var(${--holberton-red})`,
-	},
+    appHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        fontSize: '1.2rem',
+        color: '#e11d3f',
+        bordeBottom: 'solid #e11d3f'
+    },
+      
+    appHeaderImg: {
+        width: 250
+    }
 });
 
 export default Header;

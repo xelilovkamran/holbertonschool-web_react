@@ -1,91 +1,53 @@
 import React from 'react';
-import { expect } from 'chai';
-import Adapter from 'enzyme-adapter-react-16';
-import { shallow, configure, mount } from 'enzyme';
-import Header from './Header';
-import { StyleSheetTestUtils, } from 'aphrodite';
+import { mount } from 'enzyme';
+import Header from "./Header";
 import AppContext from '../App/AppContext';
 
-configure({adapter: new Adapter()});
-
-describe("Testing the <Header /> Component", () => {
-	
-	let wrapper;
-
-	let context = {
-		user: {
-			email: 'messi@gmail.com',
-			password: '1234abcd',
-			isLoggedIn: true,
-		},
-		logOut: () => {},
-	};
-
-	beforeEach(() => {
-		wrapper = mount(
-			<Header shouldRender />,
-			{ context: AppContext }
-		);
-
-		StyleSheetTestUtils.suppressStyleInjection();
-	});
-
-	afterEach(() => {
-		StyleSheetTestUtils.clearBufferAndResumeStyleInjection();
-	});
-
-	it("<Header /> is rendered without crashing", () => {
-		expect(wrapper.render()).to.not.be.an('undefined');
-	});
-
-	it("<Header /> render img tag", () => {
-		expect(wrapper.find('img')).to.have.lengthOf(1);
-	});
-
-	it("<Header /> render h1 tag", () => {
-		expect(wrapper.find('h1')).to.have.lengthOf(1);
-	});
-
-	it("Verify that the logoutSection is not created", () => {
-		expect(wrapper.find("#logoutSection")).to.have.lengthOf(0);
-	});
-
-	it("Verify that the logoutSection is created", () => {
-		let context = {
-			user: {
-				email: 'messi@gmail.com',
-				password: '1234abcd',
-				isLoggedIn: true,
-			},
-			logOut: () => {},
-		};
-
-		let wrapperTwo = mount(
-			<Header />,
-			{ context: context }
-		);
-		expect(wrapperTwo.find("#logoutSection").at(0)).to.not.be.false;
-	});
-
-	it("Verify that clicking on the link 'Logout' is calling the spy", () => {		
-		let context = {
-			user: {
-				email: 'messi@gmail.com',
-				password: '1234abcd',
-				isLoggedIn: true,
-			},
-			logOut: () => {},
-		};
-
-		let wrapperTwo = mount(
-			<Header />,
-			{ context: context }
-		);
-
-		let spy = jest.spyOn(wrapperTwo.instance().context, "logOut");
-
-		// wrapperTwo.find('a').simulate('click');
-		// expect(spy).toBeCalled();
-	});
-
+describe('Tests the Header component', () => {
+    let defaultUser;
+    let loggedUser;
+    let logOut;
+    let defaultContextValue;
+    let userDefinedValue;
+    beforeAll(() => {
+        defaultUser = {
+            email: "",
+            password: "",
+            isLoggedIn: false
+        };
+        loggedUser = {
+            email: "hello@world.com",
+            password: "test123!",
+            isLoggedIn: true
+        }
+        logOut = jest.fn();
+        defaultContextValue = {user: defaultUser, logOut};
+        userDefinedValue = {user: loggedUser, logOut};
+    });
+    afterEach(() => {
+        logOut.mockClear();
+    });
+    it('Tests that Headers renders without crashing', () => {
+        const wrapper = mount(<AppContext.Provider value={defaultContextValue}><Header /></AppContext.Provider>);
+        expect(wrapper.exists()).toBe(true);
+    });
+    it('Tests that the component render img and h1 tags', () => {
+        const wrapper = mount(<AppContext.Provider value={defaultContextValue}><Header /></AppContext.Provider>);
+        expect(wrapper.find('h1')).toHaveLength(1);
+        expect(wrapper.find('img')).toHaveLength(1);
+    });
+    it('Tests that the logoutSection is not created', () => {
+        const wrapper = mount(<AppContext.Provider value={defaultContextValue}><Header /></AppContext.Provider>);
+        expect(wrapper.find('#logoutSection')).toHaveLength(0);
+    });
+    it('Tests that the logoutSection is created', () => {
+        const wrapper = mount(<AppContext.Provider value={userDefinedValue}><Header /></AppContext.Provider>);
+        expect(wrapper.find('#logoutSection')).toHaveLength(1);
+    });
+    it('Tests that clicking on the link is calling the spy', () => {
+        const wrapper = mount(<AppContext.Provider value={userDefinedValue}><Header /></AppContext.Provider>);
+        const link = wrapper.find('a');
+        link.simulate('click');
+        expect(userDefinedValue.logOut).toHaveBeenCalledTimes(1);
+    });
 });
